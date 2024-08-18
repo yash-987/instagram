@@ -1,4 +1,4 @@
-import { atom, selector } from 'recoil'
+import { atom, selector, useRecoilState,  } from 'recoil'
 
 export const PostStore = atom({
     key: 'PostStore',
@@ -8,11 +8,19 @@ export const PostStore = atom({
 
 // this function will be used where this recoil value will be used
 // const createPost = (post) => {
-//     setPost({
-//       posts:[post,...posts]
-//     })
+//     setPost([post,...posts])
 // }
 
+
+// export const CreatePost = selector({
+//     default: 'CreatePost',
+//     get:({get})
+// })
+
+export const CreatePosts = (post) => {
+    const [posts, setPosts] = useRecoilState(PostStore)
+    setPosts([post,...posts])
+}
 
 // export const deletePost = selector({
 //     key: 'deletePost',

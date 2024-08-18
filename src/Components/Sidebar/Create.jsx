@@ -25,7 +25,8 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { PostStore } from '../../store/postStore';
 import { AuthStore } from '../../store/authStore';
 import { useLocation } from 'react-router-dom';
-import { UserProfile } from '../../store/userProfile';
+import { AddPost, UserProfile } from '../../store/userProfile';
+import { CreatePosts } from '../../store/postStore';
 import {
 	addDoc,
 	arrayUnion,
@@ -143,32 +144,33 @@ function useCreatePost() {
 	const [isLoading, setIsLoading] = useState(false);
 	const showToast = useShowToast();
 	const user = useRecoilValue(AuthStore);
-	const [posts,setPosts] = useRecoilState(PostStore);
+	// const [posts,setPosts] = useRecoilState(PostStore);
+    
 	const { pathname } = useLocation();
 	const [userProfile, setUserProfile] = useRecoilState(UserProfile);
-	const addPost = (post) => {
-		// UserProfile: {...UserProfile, posts: [post.id, ...UserProfile.posts] }
-		// use above if below doesn't work
+	// const addPost = (post) => {
+	// 	// UserProfile: {...UserProfile, posts: [post.id, ...UserProfile.posts] }
+	// 	// use above if below doesn't work
 
-		// setUserProfile({
-		// 	userProfile:{...userProfile,posts:[post.id,...userProfile.posts]}
-		// });
+	// 	// setUserProfile({
+	// 	// 	userProfile:{...userProfile,posts:[post.id,...userProfile.posts]}
+	// 	// });
 
-		setUserProfile({
-			...userProfile,
-			posts:[post.id,...userProfile.posts]
-		})
-	}
+	// 	setUserProfile({
+	// 		...userProfile,
+	// 		posts:[post.id,...userProfile.posts]
+	// 	})
+	// }
 
-		const createPost = (post) => {
-			// setPosts({
-			// 	posts: [post, ...posts],
-			// });
-			setPosts(
-				[...posts,post]
-			)
+		// const createPost = (post) => {
+		// 	// setPosts({
+		// 	// 	posts: [post, ...posts],
+		// 	// });
+		// 	setPosts(
+		// 		[post,...posts]
+		// 	)
 				
-		};
+		// };
 
 		// handle of creating post
 	const handleCreatePost = async (selectedFile, caption) => {
@@ -208,10 +210,13 @@ function useCreatePost() {
 				});
 
 				newPost.imageUrl = downloadUrl;
-				createPost({ ...newPost, id: PostDoc.id });
 
-				addPost({ ...newPost, id: PostDoc.id });
+				if (userProfile.uid === user.uid) CreatePosts({ ...newPost, id: PostDoc.id });
+				
+                
+				// addPost({ ...newPost, id: PostDoc.id });
 
+				AddPost({...newPost,id:PostDoc.id})
 				showToast('Success', "Post Created Successfully",
 					'success'
 				)

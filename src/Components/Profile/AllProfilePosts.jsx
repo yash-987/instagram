@@ -2,11 +2,11 @@ import { Box, Grid, Skeleton, VStack, Flex, Text } from '@chakra-ui/react';
 
 import ProfilePost from './ProfilePost';
 import useGetUserPosts from '../../hooks/useGetUserPosts';
-import { useEffect } from 'react';
+
 
 function AllProfilePosts() {
 	const { isLoading, posts } = useGetUserPosts();
-	console.log('posts ',posts)
+	// console.log('posts ',posts)
    
 	
 	const noPostFound = !isLoading && posts?.length === 0;

@@ -6,7 +6,7 @@ import useShowToast from './useShowToast';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '../firebase/firebase';
 import { UserProfile } from '../store/userProfile';
-import { useProgressStyles } from '@chakra-ui/react';
+
 
 function useGetUserPosts() {
 	const [isLoading, setIsLoading] = useState(true);
@@ -15,8 +15,8 @@ function useGetUserPosts() {
 	const userProfile = useRecoilValue(UserProfile);
 	// console.log(userProfile.posts)
 	useEffect(() => {
-		console.log('UseEffect triggered', userProfile);
-		console.log('hi');
+		// console.log('UseEffect triggered', userProfile);
+		// console.log('hi');
 
 		const getPosts = async () => {
 			if (!userProfile) return;
@@ -26,7 +26,7 @@ function useGetUserPosts() {
 				const postRef = collection(firestore, 'posts');
 				const q = query(postRef, where('createdBy', '==', userProfile.uid));
 				const querySnapshot = await getDocs(q);
-
+             
 				const posts = [];
 				querySnapshot.forEach((doc) =>
 					posts.push({ ...doc.data(), id: doc.id })
@@ -44,7 +44,7 @@ function useGetUserPosts() {
 			}
 		};
 		getPosts();
-		console.log('posts', posts);
+		// console.log('posts', posts);
 		
 	}, [setPosts, userProfile, showToast,]);
 
