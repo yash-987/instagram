@@ -43,7 +43,7 @@ function ProfilePost({ post }) {
 	function dltPost(id) {
 		setPosts(posts.filter((post)=>post.id!==id))
 	}
-	
+	console.log(post)
 	// console.log(userProfile.uid)
 	// console.log(user.uid)
 	

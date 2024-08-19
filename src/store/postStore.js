@@ -17,10 +17,6 @@ export const PostStore = atom({
 //     get:({get})
 // })
 
-export const CreatePosts = (post) => {
-    const [posts, setPosts] = useRecoilState(PostStore)
-    setPosts([post,...posts])
-}
 
 // export const deletePost = selector({
 //     key: 'deletePost',

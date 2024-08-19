@@ -9,16 +9,6 @@ export const UserProfile = atom({
 })
 
 
-export const AddPost = (post) => {
-    const [userprofile, setUserProfile] = useRecoilState(UserProfile)
-    const posts = useRecoilValue(PostStore)
-    console.log(posts)
-    setUserProfile({
-        ...userprofile,
-        posts:[post.id,...posts]
-    })
-}
-
 
 // function which i will store in different file
 // const addPost = (post) =>{

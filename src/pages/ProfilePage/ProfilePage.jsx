@@ -17,10 +17,10 @@ import { useEffect } from 'react';
 import Posts from '../../Components/Fyp/Posts';
 function ProfilePage() {
 	const { username } = useParams();
-	
-	
-	
 	const { isLoading, userProfile } = useGetUserProfileByUsername(username);
+	
+	
+	
 
 	const userNotFound = !isLoading && !userProfile;
 	// const {posts} = useGetUserPosts()

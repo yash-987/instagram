@@ -21,12 +21,11 @@ import { BsFillImageFill } from 'react-icons/bs';
 import { useRef, useState } from 'react';
 import usePreviewImg from '../../hooks/usePreviewImg';
 import useShowToast from '../../hooks/useShowToast';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { PostStore } from '../../store/postStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { AuthStore } from '../../store/authStore';
 import { useLocation } from 'react-router-dom';
-import { AddPost, UserProfile } from '../../store/userProfile';
-import { CreatePosts } from '../../store/postStore';
+import { UserProfile } from '../../store/userProfile';
+import { PostStore } from '../../store/postStore';
 import {
 	addDoc,
 	arrayUnion,
@@ -36,26 +35,24 @@ import {
 } from 'firebase/firestore';
 import { firestore, storage } from '../../firebase/firebase';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
+
 const CreatePost = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [caption, setCaption] = useState('');
 	const fileRef = useRef(null);
-    const {isLoading,handleCreatePost} = useCreatePost()
+	const { isLoading, handleCreatePost } = useCreatePost();
 	const { handleImageChange, selectedFile, setSelectedFile } = usePreviewImg();
-  const showToast = useShowToast()
+	const showToast = useShowToast();
 	const handlePostCreation = async () => {
 		try {
-			await handleCreatePost(selectedFile, caption)
+			await handleCreatePost(selectedFile, caption);
 			onClose();
-			setCaption(''
-
-			)
-			setSelectedFile(null)
-			
+			setCaption('');
+			setSelectedFile(null);
 		} catch (error) {
-			showToast('Error',error.message,'error')
+			showToast('Error', error.message, 'error');
 		}
-	}
+	};
 	return (
 		<>
 			<Tooltip
@@ -130,7 +127,9 @@ const CreatePost = () => {
 					</ModalBody>
 
 					<ModalFooter>
-						<Button mr={3} onClick={handlePostCreation} isLoading={isLoading}>Post</Button>
+						<Button mr={3} onClick={handlePostCreation} isLoading={isLoading}>
+							Post
+						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
@@ -144,8 +143,8 @@ function useCreatePost() {
 	const [isLoading, setIsLoading] = useState(false);
 	const showToast = useShowToast();
 	const user = useRecoilValue(AuthStore);
-	// const [posts,setPosts] = useRecoilState(PostStore);
-    
+	const [posts, setPosts] = useRecoilState(PostStore);
+
 	const { pathname } = useLocation();
 	const [userProfile, setUserProfile] = useRecoilState(UserProfile);
 	// const addPost = (post) => {
@@ -162,71 +161,94 @@ function useCreatePost() {
 	// 	})
 	// }
 
-		// const createPost = (post) => {
-		// 	// setPosts({
-		// 	// 	posts: [post, ...posts],
-		// 	// });
-		// 	setPosts(
-		// 		[post,...posts]
-		// 	)
-				
-		// };
+	const CreatePosts = (post) => {
+		setPosts([...posts, post]);
+	};
 
-		// handle of creating post
+	const AddPost = (post) => {
+		const posts = useRecoilValue(PostStore);
+		console.log(posts);
+		setUserProfile({
+			...userProfile,
+			posts: [post.id, ...posts],
+		});
+	};
+
+	// const createPost = (post) => {
+	// 	// setPosts({
+	// 	// 	posts: [post, ...posts],
+	// 	// });
+	// 	setPosts(
+	// 		[post,...posts]
+	// 	)
+
+	// };
+
+	// handle of creating post
 	const handleCreatePost = async (selectedFile, caption) => {
-			if(isLoading) return
-			if (!selectedFile) throw new Error('Please select an image');
-			setIsLoading(true);
+		if (isLoading) return;
+		if (!selectedFile) throw new Error('Please select an image');
+		setIsLoading(true);
 
-			const newPost = {
-				caption: caption,
-				likes: [],
-				comments: [],
-				createdAt: Date.now(),
-				createdBy: user.uid,
-			};
-
-			try {
-				//post ref
-				const PostRef = collection(firestore, 'posts');
-				const PostDoc = await addDoc(PostRef, newPost);
-
-				//userREf
-				const userDocRef = doc(firestore, 'users', user.uid);
-				//imageref
-				const imageRef = ref(storage, `posts/${PostDoc.id}`);
-
-				// update doc
-				await updateDoc(userDocRef, {
-					posts: arrayUnion(PostDoc.id),
-				});
-
-				await uploadString(imageRef, selectedFile, 'data_url');
-
-				const downloadUrl = await getDownloadURL(imageRef);
-
-				await updateDoc(PostDoc, {
-					imageUrl: downloadUrl,
-				});
-
-				newPost.imageUrl = downloadUrl;
-
-				if (userProfile.uid === user.uid) CreatePosts({ ...newPost, id: PostDoc.id });
-				
-                
-				// addPost({ ...newPost, id: PostDoc.id });
-
-				AddPost({...newPost,id:PostDoc.id})
-				showToast('Success', "Post Created Successfully",
-					'success'
-				)
-			} catch (error) {
-				showToast('Error', error.message, 'error');
-			} finally {
-				setIsLoading(false);
-			}
+		const newPost = {
+			caption: caption,
+			likes: [],
+			comments: [],
+			createdAt: Date.now(),
+			createdBy: user.uid,
 		};
-	
+
+		try {
+			//post ref
+			// const PostRef = collection(firestore, 'posts');
+			// const PostDoc = await addDoc(PostRef, newPost);
+
+			console.log('post creation started');
+			const PostDoc = await addDoc(collection(firestore, 'posts'), newPost);
+
+			//userREf
+			const userDocRef = doc(firestore, 'users', user.uid);
+			//imageref
+			const imageRef = ref(storage, `posts/${PostDoc.id}`);
+
+			// update doc
+			await updateDoc(userDocRef, {
+				posts: arrayUnion(PostDoc.id),
+			});
+
+			await uploadString(imageRef, selectedFile, 'data_url');
+
+			const downloadUrl = await getDownloadURL(imageRef);
+
+			await updateDoc(PostDoc, {
+				imageUrl: downloadUrl,
+			});
+			// post created in backend
+			newPost.imageUrl = downloadUrl;
+
+			// console.log(downloadUrl);
+
+			console.log('post is just about to be created');
+
+			// if (userProfile.uid === user.uid) {
+			// 	CreatePosts({ ...newPost, id: PostDoc.id });
+			// 	return;
+			// }
+
+			// AddPost({ ...newPost, id: PostDoc.id });
+
+			// addPost({ ...newPost, id: PostDoc.id });
+
+			console.log('before successfull');
+			showToast('Success', 'Post Created Successfully', 'success');
+			console.log('after successfull');
+		} catch (error) {
+			showToast('Error', error.message, 'error');
+			console.log(error.message);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	return { isLoading, handleCreatePost };
 }
