@@ -1,15 +1,11 @@
-import { Box, Container, Flex, Skeleton, SkeletonCircle, VStack } from '@chakra-ui/react'
+import { Box,Text, Container, Flex, Skeleton, SkeletonCircle, VStack } from '@chakra-ui/react'
 import Posts from './Posts'
-import { useEffect, useState } from 'react'
+
+import useGetFeedPosts from '../../hooks/useGetFeedPosts'
 
 function Feed() {
-  const [isLoading, setLoading] = useState(true)
-  
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false)
-    }, 0.5 *1000);
-  },[])
+  const { isLoading, posts } = useGetFeedPosts()
+  console.log(posts)
   return (
       <Container maxW={'container.sm'} py={10} px={2}>
       {isLoading && [0, 1, 2, 3].map((_, index) => (
@@ -23,22 +19,27 @@ function Feed() {
             
           </Flex>
           <Skeleton w={'full'} >
-            <Box h={'500px'}>contents wrapped</Box>
+            <Box h={'400px'}>contents wrapped</Box>
           </Skeleton>
           
            </VStack>
           ))}
       
 
-      {!isLoading && (
-        <>
-        
-        <Posts username='yash' img='/img1.png' avatar='/img1.png'/>
-          <Posts username='john doe' img='/img2.png' avatar='/img2.png'/>
-          <Posts username='asprogrammer' img='/img3.png' avatar='/img3.png'/>
-          <Posts username='harkirat' img='/img4.png' avatar='/img4.png' />
-        </>
-         )}
+      {!isLoading &&   (
+       
+        posts.map((post) => (
+          <Posts key={post.id} post={post} />
+        ))
+      )}
+      {!isLoading && posts.length === 0 && (
+				<>
+					<Text fontSize={"md"} color={"red.400"}>
+						Dayuum. Looks like you don&apos;t have any friends.
+					</Text>
+					<Text color={"red.400"}>Stop coding and go make some!!</Text>
+				</>
+			)}
     </Container>
   )
 }

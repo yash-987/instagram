@@ -6,35 +6,77 @@ import {
 	InputGroup,
 	InputRightElement,
 	Text,
+	useDisclosure,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
 	CommentLogo,
 	NotificationsLogo,
 	UnlikeLogo,
 } from '../../assets/Constants';
 import PropTypes from 'prop-types';
-function PostFooter({ username, isProfilePage }) {
-	const [liked, setLiked] = useState(false);
-	const [likeCount, setLikeCount] = useState(0);
+import useCreateComment from '../../hooks/useCreateComment';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { AuthStore } from '../../store/authStore';
+import useLikePost from '../../hooks/useLikePost';
+import { PostStore } from '../../store/postStore';
+import { timeAgo } from '../../../utils/timeAgo';
+import CommentsModal from '../Modals/CommentsModal';
+function PostFooter({ post,  isProfilePage, creatorProfile }) {
+	const [comment, setComment] = useState('');
+	const { isCommenting, handleComment } = useCreateComment();
+	const user = useRecoilValue(AuthStore);
+	const commentRef = useRef(null);
+	const { isLiked, likeCount, handleLikePost } = useLikePost(post);
+	const setPosts = useSetRecoilState(PostStore);
+	const { isOpen, onClose, onOpen } = useDisclosure();
 
-	function handleLike() {
-		if (liked) {
-			setLiked(false);
-			setLikeCount((prev) => prev - 1);
-		} else {
-			setLiked(true);
-			setLikeCount((prev) => prev + 1);
-		}
+	const addCommentToPostStore = (postId, comment) => {
+		setPosts((prevPosts) =>
+			prevPosts.map((post) => {
+				if (post.id === postId) {
+					return {
+						...post,
+						comments: [...post.comments, comment],
+					};
+				}
+				return post;
+			})
+		);
+	};
+	// const setPosts= useSetRecoilState(PostStore)
+
+	// adding a comment to the post  store
+
+	// const addCommentToPostStore = useCallback((postId, comment) => {
+	//     setPosts((prevPosts) => prevPosts.map((post) => {
+	//         if (post.id === postId) {
+	//             return {
+	//                 ...post,
+	//                 comments: [...post.comments, comment],
+	//             }
+	//         }
+	//         return post
+	//     }))
+	// },[setPosts])
+	async function handlePostComment(e) {
+		e.preventDefault();
+		await handleComment(post.id, comment);
+		addCommentToPostStore(post.id, comment);
+		setComment('');
 	}
 
 	return (
 		<Box mb={10}>
 			<Flex alignItems={'center'} gap={4} w={'full'} pt={0} mb={2} mt={'4'}>
-				<Box onClick={handleLike} cursor={'pointer'} fontSize={18}>
-					{!liked ? <NotificationsLogo /> : <UnlikeLogo />}
+				<Box onClick={handleLikePost} cursor={'pointer'} fontSize={18}>
+					{!isLiked ? <NotificationsLogo /> : <UnlikeLogo />}
 				</Box>
-				<Box cursor={'pointer'} fontSize={18}>
+				<Box
+					cursor={'pointer'}
+					fontSize={18}
+					onClick={() => commentRef.current.focus()}
+				>
 					<CommentLogo />
 				</Box>
 			</Flex>
@@ -43,47 +85,76 @@ function PostFooter({ username, isProfilePage }) {
 					? `${likeCount} like`
 					: `${likeCount} likes`}
 			</Text>
+			{isProfilePage && (
+				<Text fontSize={12} color={'gray'}>
+					Posted {timeAgo(post.createdAt)}
+				</Text>
+			)}
 			{!isProfilePage && (
 				<>
 					<Text fontSize={'sm'} fontWeight={700}>
-						{username}{' '}
+						{creatorProfile?.username}{' '}
 						<Text as={'span'} fontWeight={400}>
-							Feeling good
+							{post.caption}
 						</Text>
 					</Text>
-					<Text fontSize={'sm'} color={'gray'}>
-						View all 1,000 comments
-					</Text>
+					{post.comments.length > 0 && (
+						<Text
+							fontSize={'sm'}
+							color={'gray'}
+							cursor={'pointer'}
+							onClick={onOpen}
+						>
+							View all {post.comments.length} comments
+						</Text>
+					)}
+					{isOpen ? (
+						<CommentsModal post={post} isOpen={isOpen} onClose={onClose} />
+					) : null}
 				</>
 			)}
 
-			<Flex alignItems={'center'} gap={2} justifyContent={'center'} w={'full'}>
-				<InputGroup>
-					<Input
-						placeholder="Add a comment..."
-						variant={'flushed'}
-						fontSize={14}
-					/>
-					<InputRightElement>
-						<Button
-							color={'blue.500'}
-							bg={'transparent'}
-							_hover={{ color: 'white' }}
-							fontWeight={600}
-							cursor={'pointer'}
+			{user && (
+				<Flex
+					alignItems={'center'}
+					gap={2}
+					justifyContent={'center'}
+					w={'full'}
+				>
+					<InputGroup>
+						<Input
+							placeholder="Add a comment..."
+							variant={'flushed'}
 							fontSize={14}
-						>
-							Post
-						</Button>
-					</InputRightElement>
-				</InputGroup>
-			</Flex>
+							onChange={(e) => setComment(e.target.value)}
+							value={comment}
+							ref={commentRef}
+						/>
+						<InputRightElement>
+							<Button
+								color={'blue.500'}
+								bg={'transparent'}
+								_hover={{ color: 'white' }}
+								fontWeight={600}
+								cursor={'pointer'}
+								fontSize={14}
+								isLoading={isCommenting}
+								onClick={handlePostComment}
+							>
+								Post
+							</Button>
+						</InputRightElement>
+					</InputGroup>
+				</Flex>
+			)}
 		</Box>
 	);
 }
 
 PostFooter.propTypes = {
+	post: PropTypes.object,
 	username: PropTypes.string,
 	isProfilePage: PropTypes.bool,
+	creatorProfile: PropTypes.object,
 };
 export default PostFooter;

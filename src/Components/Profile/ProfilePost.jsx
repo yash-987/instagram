@@ -20,38 +20,43 @@ import { FaComment } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import PropTypes from 'prop-types';
 import Comment from '../Comments/Comment';
-import { useRecoilState, useRecoilValue,  } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { UserProfile } from '../../store/userProfile';
 import { AuthStore } from '../../store/authStore';
-import useDeletePost from '../../hooks/useDeletePost';
+
 import useShowToast from '../../hooks/useShowToast';
 import { useState } from 'react';
 import { firestore, storage } from '../../firebase/firebase';
 import { deleteObject, ref } from 'firebase/storage';
 import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { PostStore } from '../../store/postStore';
+import Caption from '../Comments/Caption';
 // import {  PostStore } from '../../store/postStore';
 
 function ProfilePost({ post }) {
 	// const {isLoading,handleDeletePost} = useDeletePost()
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const userProfile = useRecoilValue(UserProfile);
+	const [userProfile, setUserProfile] = useRecoilState(UserProfile);
 	const user = useRecoilValue(AuthStore);
 	const showToast = useShowToast();
-	const [posts,setPosts] = useRecoilState(PostStore)
+	const [posts, setPosts] = useRecoilState(PostStore);
 	const [isDeleting, setIsDeleting] = useState(false);
+
 	function dltPost(id) {
-		setPosts(posts.filter((post)=>post.id!==id))
+		setPosts(posts.filter((post) => post.id !== id));
 	}
-	console.log(post)
-	// console.log(userProfile.uid)
-	// console.log(user.uid)
-	
+
+	function decrementPostsCount(postId) {
+		setUserProfile({
+			...userProfile,
+			posts: userProfile.posts.filter((id) => id !== postId),
+		});
+	}
+
 	const handleDeletePost = async () => {
 		setIsDeleting(true);
 		if (!window.confirm('Are you sure you want to delete this post?')) return;
 		try {
-			
 			//image ref
 			const imageRef = ref(storage, `posts/${post.id}`);
 			console.log(imageRef);
@@ -60,13 +65,13 @@ function ProfilePost({ post }) {
 
 			const userRef = doc(firestore, 'users', user.uid);
 
-			await deleteDoc(doc(firestore, 'posts', post.id))
-			
+			await deleteDoc(doc(firestore, 'posts', post.id));
+
 			await updateDoc(userRef, {
 				posts: arrayRemove(post.id),
 			});
-			dltPost(post.id)
-            
+			dltPost(post.id);
+			decrementPostsCount(post.id);
 
 			showToast('Success', 'Post deleted successfully', 'success');
 		} catch (error) {
@@ -127,7 +132,7 @@ function ProfilePost({ post }) {
 			</GridItem>
 
 			<Modal
-				size={{ base: '3xl', md: '5xl' }}
+				size={{ base: '3xl', md: '6xl' }}
 				isCentered={true}
 				isOpen={isOpen}
 				onClose={onClose}
@@ -163,7 +168,11 @@ function ProfilePost({ post }) {
 									md: 'flex',
 								}}
 							>
-								<Flex alignItems={'center'} justifyContent={'space-between'}>
+								<Flex
+									alignItems={'center'}
+									justifyContent={'space-around'}
+									w={'full'}
+								>
 									<Flex alignItems={'center'} gap={4}>
 										<Avatar
 											src={userProfile.profilePicUrl}
@@ -175,6 +184,7 @@ function ProfilePost({ post }) {
 											{userProfile.username}
 										</Text>
 									</Flex>
+									{post.caption && <Caption post={post} />}
 									{user.uid === userProfile.uid && (
 										<Button
 											size={'sm'}
@@ -199,21 +209,15 @@ function ProfilePost({ post }) {
 									maxH={'350px'}
 									overflowY={'auto'}
 								>
-									<Comment
-										createdAt="1d ago"
-										username="ayoitsyash"
-										profilePic="/profilepic.png"
-										text={'Draft.'}
-									/>
-									<Comment
-										createdAt="1d ago"
-										username="ayoitsyash"
-										profilePic="/profilepic.png"
-										text={'Draft.'}
-									/>
+									{/* caption */}
+
+									{/* comments */}
+									{post.comments?.map((comment,idx) => (
+										<Comment key={idx} comment={comment} />
+									))}
 								</VStack>
 								<Divider mt={'auto'} bg={'gray.800'} />
-								<PostFooter isProfilePage={true} />
+								<PostFooter isProfilePage={true} post={post} />
 							</Flex>
 						</Flex>
 					</ModalBody>

@@ -1,6 +1,10 @@
-import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
+import { Avatar, Box, Button, Flex, Skeleton,SkeletonCircle } from '@chakra-ui/react';
 import PropTypes from 'prop-types'
- function PostHeader({ username, avatar }) {
+import { Link } from 'react-router-dom';
+import useFollowUser from '../../hooks/useFollowUser';
+import { timeAgo } from '../../../utils/timeAgo';
+function PostHeader({ post, creatorProfile }) {
+	 const {isFollowing,isUpdating,handleFollower} = useFollowUser(post.createdBy)
 	return (
 		<Flex
 			justifyContent={'space-between'}
@@ -10,14 +14,32 @@ import PropTypes from 'prop-types'
 		>
 			<Flex alignItems={'center'} gap={2}>
 				{/* profile image */}
-				<Avatar src={avatar} size={'sm'} alt="user profile pic" />
+				{creatorProfile ? (
+				<Link to={`/${creatorProfile.username}`} >
+				
+				<Avatar src={creatorProfile.profilePicUrl} size={'sm'} alt="user profile pic" />
+				</Link>
+				): (
+					<SkeletonCircle size='10' />
+				)}
+				
 				<Flex fontSize={12} fontWeight={'bold'} gap={2}>
-					{username}
-					<Box color={'gray.500'}>•1w </Box>
+					{creatorProfile ? (
+						<Link to={`/${creatorProfile.username}`} >
+						
+						{creatorProfile.username}
+					</Link>
+					) : (
+						<Skeleton w={"100px"} h={"10px"} />
+					)}
+
+					<Box color={'gray.500'}>• {timeAgo(post.createdAt)} </Box>
 				</Flex>
 			</Flex>
 			<Box cursor={'pointer'}>
-				<Text
+				<Button
+					size={'xs'}
+					bg={'transparent'}
 					fontSize={12}
 					color={'blue.500'}
 					fontWeight={'bold'}
@@ -25,17 +47,20 @@ import PropTypes from 'prop-types'
 						color: 'white',
 					}}
 					transition={'0.2s ease-in-out'}
+					onClick={handleFollower}
+					isLoading={isUpdating}
+					
 				>
-					Unfollow
-				</Text>
+					{isFollowing? 'Unfollow': 'Follow'}
+				</Button>
 			</Box>
 		</Flex>
 	);
 }
 
 PostHeader.propTypes = {
-  username: PropTypes.string.isRequired,
-  avatar: PropTypes.string.isRequired,
+	post: PropTypes.object.isRequired,
+	creatorProfile: PropTypes.object.isRequired
 }
 
 export default PostHeader;

@@ -1,24 +1,21 @@
-import { Avatar, Box, Button, Flex, Link, Tooltip } from '@chakra-ui/react';
+import {  Box, Button, Flex, Link, Tooltip } from '@chakra-ui/react';
 
 import { Link as RouterLink } from 'react-router-dom';
 import {
-	CreatePostLogo,
+	
 	InstagramLogo,
 	InstagramMobileLogo,
 	
 	
 } from '../../assets/Constants';
-import { AiFillHome } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
 import useSignout from '../../hooks/useSignout';
-import { AuthStore } from '../../store/authStore';
-import { useRecoilValue } from 'recoil';
+
 import SidebarItems from './SidebarItems';
 // import useSignout from '../../hooks/useSignout';
 
 function Sidebar() {
-	const user = useRecoilValue(AuthStore)
-
+	
 	
 
     // const { handleLogout } = useSignout();

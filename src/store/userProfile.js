@@ -1,6 +1,6 @@
 
-import { atom, useRecoilState, useRecoilValue,  } from 'recoil'
-import { PostStore } from './postStore'
+import { atom,   } from 'recoil'
+
 
 // we're storing userprofile in the global state because we need to use it in multiple components
 export const UserProfile = atom({

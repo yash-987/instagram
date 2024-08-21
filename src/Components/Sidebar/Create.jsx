@@ -147,42 +147,17 @@ function useCreatePost() {
 
 	const { pathname } = useLocation();
 	const [userProfile, setUserProfile] = useRecoilState(UserProfile);
-	// const addPost = (post) => {
-	// 	// UserProfile: {...UserProfile, posts: [post.id, ...UserProfile.posts] }
-	// 	// use above if below doesn't work
-
-	// 	// setUserProfile({
-	// 	// 	userProfile:{...userProfile,posts:[post.id,...userProfile.posts]}
-	// 	// });
-
-	// 	setUserProfile({
-	// 		...userProfile,
-	// 		posts:[post.id,...userProfile.posts]
-	// 	})
-	// }
-
+	
 	const CreatePosts = (post) => {
 		setPosts([...posts, post]);
 	};
 
 	const AddPost = (post) => {
-		const posts = useRecoilValue(PostStore);
-		console.log(posts);
 		setUserProfile({
 			...userProfile,
-			posts: [post.id, ...posts],
+			posts: [...posts, post],
 		});
 	};
-
-	// const createPost = (post) => {
-	// 	// setPosts({
-	// 	// 	posts: [post, ...posts],
-	// 	// });
-	// 	setPosts(
-	// 		[post,...posts]
-	// 	)
-
-	// };
 
 	// handle of creating post
 	const handleCreatePost = async (selectedFile, caption) => {
@@ -200,12 +175,11 @@ function useCreatePost() {
 
 		try {
 			//post ref
-			// const PostRef = collection(firestore, 'posts');
-			// const PostDoc = await addDoc(PostRef, newPost);
+			const PostRef = collection(firestore, 'posts');
+			const PostDoc = await addDoc(PostRef, newPost);
 
 			console.log('post creation started');
-			const PostDoc = await addDoc(collection(firestore, 'posts'), newPost);
-
+		
 			//userREf
 			const userDocRef = doc(firestore, 'users', user.uid);
 			//imageref
@@ -230,12 +204,10 @@ function useCreatePost() {
 
 			console.log('post is just about to be created');
 
-			// if (userProfile.uid === user.uid) {
-			// 	CreatePosts({ ...newPost, id: PostDoc.id });
-			// 	return;
-			// }
+			if (userProfile.uid === user.uid)
+				CreatePosts({ ...newPost, id: PostDoc.id });
 
-			// AddPost({ ...newPost, id: PostDoc.id });
+			if (pathname !== '/' && userProfile.uid === user.uid) AddPost({ ...newPost, id: PostDoc.id });
 
 			// addPost({ ...newPost, id: PostDoc.id });
 
@@ -251,29 +223,4 @@ function useCreatePost() {
 	};
 
 	return { isLoading, handleCreatePost };
-}
-// 2-COPY AND PASTE FOR THE MODAL
-{
-	/* <Modal isOpen={isOpen} onClose={onClose} size='xl'>
-				<ModalOverlay />
-
-				<ModalContent bg={"black"} border={"1px solid gray"}>
-					<ModalHeader>Create Post</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody pb={6}>
-						<Textarea placeholder='Post caption...' />
-
-						<Input type='file' hidden />
-
-						<BsFillImageFill
-							style={{ marginTop: "15px", marginLeft: "5px", cursor: "pointer" }}
-							size={16}
-						/>
-					</ModalBody>
-
-					<ModalFooter>
-						<Button mr={3}>Post</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal> */
 }
