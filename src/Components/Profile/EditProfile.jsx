@@ -19,7 +19,6 @@ import {
 
 import PropTypes from 'prop-types';
 import { useRef, useState } from 'react';
-// import { UpdateProfile } from '../../hooks/useUpdateProfile';
 import { useRecoilValue } from 'recoil';
 
 
@@ -43,8 +42,7 @@ const EditProfile = ({ isOpen, onClose }) => {
 	const showToast = useShowToast();
 	const { handleImageChange, selectedFile, setSelectedFile } = usePreviewImg();
 
-	// const {handleUpdateProfile} = UpdateProfile()
-	// optimizing the input fields. if user doesn't want to do any change in any of the field then it's gonna take the previous value of the inputs
+	
 
 	const { isUpdating, EditProfile } = useEditProfile();
 	const handleEditProfile = async () => {

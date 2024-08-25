@@ -13,10 +13,10 @@ function useGetUserPosts() {
 	const [posts, setPosts] = useRecoilState(PostStore);
 	const showToast = useShowToast();
 	const userProfile = useRecoilValue(UserProfile);
-	// console.log(userProfile.posts)
+
 	useEffect(() => {
-		// console.log('UseEffect triggered', userProfile);
-		// console.log('hi');
+		
+		
 
 		const getPosts = async () => {
 			if (!userProfile) return;
@@ -35,7 +35,7 @@ function useGetUserPosts() {
 				//sort posts in ascending order
 				posts.sort((a, b) => b.createdAt - a.createdAt);
 				setPosts(posts);
-				// console.log('posts',posts)
+		
 			} catch (error) {
 				showToast('Error', error.message, 'error');
 				setPosts([]);
@@ -44,7 +44,7 @@ function useGetUserPosts() {
 			}
 		};
 		getPosts();
-		// console.log('posts', posts);
+	
 		
 	}, [setPosts, userProfile, showToast,]);
 

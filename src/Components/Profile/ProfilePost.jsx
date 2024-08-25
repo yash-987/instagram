@@ -31,6 +31,8 @@ import { deleteObject, ref } from 'firebase/storage';
 import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { PostStore } from '../../store/postStore';
 import Caption from '../Comments/Caption';
+import useCreateComment from '../../hooks/useCreateComment';
+import useGetUserProfileById from '../../hooks/useGetUserProfileById';
 // import {  PostStore } from '../../store/postStore';
 
 function ProfilePost({ post }) {
@@ -41,11 +43,12 @@ function ProfilePost({ post }) {
 	const showToast = useShowToast();
 	const [posts, setPosts] = useRecoilState(PostStore);
 	const [isDeleting, setIsDeleting] = useState(false);
-
+	const { isLoading } = useGetUserProfileById(post.createdBy)
+	const {isCommenting} = useCreateComment()
 	function dltPost(id) {
 		setPosts(posts.filter((post) => post.id !== id));
 	}
-
+     
 	function decrementPostsCount(postId) {
 		setUserProfile({
 			...userProfile,
@@ -212,7 +215,7 @@ function ProfilePost({ post }) {
 									{/* caption */}
 
 									{/* comments */}
-									{post.comments?.map((comment,idx) => (
+									{ user && !isCommenting && !isLoading && post.comments?.map((comment,idx) => (
 										<Comment key={idx} comment={comment} />
 									))}
 								</VStack>

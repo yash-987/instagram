@@ -1,10 +1,19 @@
-import { Avatar, Box, Button, Flex, Skeleton,SkeletonCircle } from '@chakra-ui/react';
-import PropTypes from 'prop-types'
+import {
+	Avatar,
+	Box,
+	Button,
+	Flex,
+	Skeleton,
+	SkeletonCircle,
+} from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import useFollowUser from '../../hooks/useFollowUser';
 import { timeAgo } from '../../../utils/timeAgo';
 function PostHeader({ post, creatorProfile }) {
-	 const {isFollowing,isUpdating,handleFollower} = useFollowUser(post.createdBy)
+	const { isFollowing, isUpdating, handleFollower } = useFollowUser(
+		post.createdBy
+	);
 	return (
 		<Flex
 			justifyContent={'space-between'}
@@ -15,22 +24,24 @@ function PostHeader({ post, creatorProfile }) {
 			<Flex alignItems={'center'} gap={2}>
 				{/* profile image */}
 				{creatorProfile ? (
-				<Link to={`/${creatorProfile.username}`} >
-				
-				<Avatar src={creatorProfile.profilePicUrl} size={'sm'} alt="user profile pic" />
-				</Link>
-				): (
-					<SkeletonCircle size='10' />
+					<Link to={`/${creatorProfile.username}`}>
+						<Avatar
+							src={creatorProfile.profilePicUrl}
+							size={'sm'}
+							alt="user profile pic"
+						/>
+					</Link>
+				) : (
+					<SkeletonCircle size="10" />
 				)}
-				
+
 				<Flex fontSize={12} fontWeight={'bold'} gap={2}>
 					{creatorProfile ? (
-						<Link to={`/${creatorProfile.username}`} >
-						
-						{creatorProfile.username}
-					</Link>
+						<Link to={`/${creatorProfile.username}`}>
+							{creatorProfile.username}
+						</Link>
 					) : (
-						<Skeleton w={"100px"} h={"10px"} />
+						<Skeleton w={'100px'} h={'10px'} />
 					)}
 
 					<Box color={'gray.500'}>• {timeAgo(post.createdAt)} </Box>
@@ -49,9 +60,8 @@ function PostHeader({ post, creatorProfile }) {
 					transition={'0.2s ease-in-out'}
 					onClick={handleFollower}
 					isLoading={isUpdating}
-					
 				>
-					{isFollowing? 'Unfollow': 'Follow'}
+					{isFollowing ? 'Unfollow' : 'Follow'}
 				</Button>
 			</Box>
 		</Flex>
@@ -60,7 +70,7 @@ function PostHeader({ post, creatorProfile }) {
 
 PostHeader.propTypes = {
 	post: PropTypes.object.isRequired,
-	creatorProfile: PropTypes.object.isRequired
-}
+	creatorProfile: PropTypes.object,
+};
 
 export default PostHeader;

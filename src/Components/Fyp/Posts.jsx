@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import useGetUserProfileById from '../../hooks/useGetUserProfileById';
 function Posts({ post }) {
 	const { userProfile } = useGetUserProfileById(post.createdBy);
-     console.log(userProfile)
+
 	return (
 		<>
             <PostHeader post={post} creatorProfile={userProfile} />

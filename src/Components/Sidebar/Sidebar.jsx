@@ -12,13 +12,13 @@ import { BiLogOut } from 'react-icons/bi';
 import useSignout from '../../hooks/useSignout';
 
 import SidebarItems from './SidebarItems';
-// import useSignout from '../../hooks/useSignout';
+
 
 function Sidebar() {
 	
 	
 
-    // const { handleLogout } = useSignout();
+    
    const {handleLogout,isLogginOut}= useSignout()
 	return (
 		<Box

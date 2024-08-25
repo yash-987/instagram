@@ -16,34 +16,36 @@ import {
 } from '../../assets/Constants';
 import PropTypes from 'prop-types';
 import useCreateComment from '../../hooks/useCreateComment';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue,  } from 'recoil';
 import { AuthStore } from '../../store/authStore';
 import useLikePost from '../../hooks/useLikePost';
-import { PostStore } from '../../store/postStore';
+// import { PostStore } from '../../store/postStore';
 import { timeAgo } from '../../../utils/timeAgo';
 import CommentsModal from '../Modals/CommentsModal';
+// import useGetUserProfileById from '../../hooks/useGetUserProfileById';
 function PostFooter({ post,  isProfilePage, creatorProfile }) {
 	const [comment, setComment] = useState('');
 	const { isCommenting, handleComment } = useCreateComment();
+    // const {userProfile} = useGetUserProfileById(creatorProfile.uid)
 	const user = useRecoilValue(AuthStore);
 	const commentRef = useRef(null);
 	const { isLiked, likeCount, handleLikePost } = useLikePost(post);
-	const setPosts = useSetRecoilState(PostStore);
+	// const setPosts = useSetRecoilState(PostStore);
 	const { isOpen, onClose, onOpen } = useDisclosure();
 
-	const addCommentToPostStore = (postId, comment) => {
-		setPosts((prevPosts) =>
-			prevPosts.map((post) => {
-				if (post.id === postId) {
-					return {
-						...post,
-						comments: [...post.comments, comment],
-					};
-				}
-				return post;
-			})
-		);
-	};
+	// const addCommentToPostStore = (postId, comment) => {
+	// 	setPosts((prevPosts) =>
+	// 		prevPosts.map((post) => {
+	// 			if (post.id === postId) {
+	// 				return {
+	// 					...post,
+	// 					comments: [...post.comments, comment],
+	// 				};
+	// 			}
+	// 			return post;
+	// 		})
+	// 	);
+	// };
 	// const setPosts= useSetRecoilState(PostStore)
 
 	// adding a comment to the post  store
@@ -62,8 +64,9 @@ function PostFooter({ post,  isProfilePage, creatorProfile }) {
 	async function handlePostComment(e) {
 		e.preventDefault();
 		await handleComment(post.id, comment);
-		addCommentToPostStore(post.id, comment);
+
 		setComment('');
+
 	}
 
 	return (
@@ -87,7 +90,7 @@ function PostFooter({ post,  isProfilePage, creatorProfile }) {
 			</Text>
 			{isProfilePage && (
 				<Text fontSize={12} color={'gray'}>
-					Posted {timeAgo(post.createdAt)}
+				{post.createdAt? `Posted ${timeAgo(post.createdAt)}`: 'Posted At Unkown Time'}
 				</Text>
 			)}
 			{!isProfilePage && (
@@ -98,7 +101,7 @@ function PostFooter({ post,  isProfilePage, creatorProfile }) {
 							{post.caption}
 						</Text>
 					</Text>
-					{post.comments.length > 0 && (
+					{post?.comments?.length > 0 && (
 						<Text
 							fontSize={'sm'}
 							color={'gray'}

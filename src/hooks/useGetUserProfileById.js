@@ -1,41 +1,46 @@
-import { useEffect, useState } from "react"
-import useShowToast from "./useShowToast";
-import { doc,  getDoc } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
+import { useEffect, useState } from 'react';
+import useShowToast from './useShowToast';
 
+import { firestore } from '../firebase/firebase';
+import { doc,  getDoc } from 'firebase/firestore';
 
 function useGetUserProfileById(userId) {
-    const [isLoading, setIsloading] = useState(true);
-    const [userProfile, setUserProfile] = useState(null)
-    const showToast = useShowToast()
+	const [isLoading, setIsloading] = useState(true);
+	const [userProfile, setUserProfile] = useState(null);
+	const showToast = useShowToast();
 
 
-    useEffect(() => {
-        console.log(
-            'userGetProfilebyid hook called'
-        )
-        const getUserProfile = async () => {
-            setIsloading(true)
-            setUserProfile(null)
-            try {
-                const userRef = doc(firestore, 'users', userId)
-                const userDoc = await getDoc(userRef)
+	useEffect(() => {
+		const getUserProfile = async () => {
+			setIsloading(true);
+			setUserProfile(null);
+			try {
+				console.log('hook called');
+				console.log('getting the reference of doc');
+ 
+				const userRef = doc(firestore, 'users', userId)
 
-                if (userDoc.exists()) {
-                    setUserProfile(userDoc.data())
-                }
-            } catch (error) {
-                showToast("Error", error.message, 'error')
-                console.log(error.message)
-            } finally {
-                setIsloading(false)
-            }
-        }
-        getUserProfile()
-    }, [setUserProfile, showToast, userId])
-    
-    return {isLoading,userProfile,setUserProfile}
+				const docSnap = await getDoc(userRef);
 
+				if (docSnap.exists()) return setUserProfile(
+					docSnap.data()
+				)
+				else console.log('User data not found')
+				
+			
+
+				
+			} catch (error) {
+				showToast('Error', error.message, 'error');
+				
+			} finally {
+				setIsloading(false);
+			}
+		};
+		getUserProfile();
+	}, [setUserProfile, showToast, userId]);
+
+	return { isLoading, userProfile, setUserProfile };
 }
 
-export default useGetUserProfileById
+export default useGetUserProfileById;

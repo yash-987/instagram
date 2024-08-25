@@ -12,26 +12,13 @@ import ProfileTabs from '../../Components/Profile/ProfileTabs';
 import AllProfilePosts from '../../Components/Profile/AllProfilePosts';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import useGetUserProfileByUsername from '../../hooks/useGetUserProfileByUsername';
-import useGetUserPosts from '../../hooks/useGetUserPosts';
-import { useEffect } from 'react';
-import Posts from '../../Components/Fyp/Posts';
+
 function ProfilePage() {
 	const { username } = useParams();
 	const { isLoading, userProfile } = useGetUserProfileByUsername(username);
-	
-	
-	
 
 	const userNotFound = !isLoading && !userProfile;
-	// const {posts} = useGetUserPosts()
-	// useEffect(() => {
-	// 	try {
-			
-	// 		console.log(posts)
-	// 	} catch (error) {
-	// 		console.log(error)
-	// 	}
-	// },[posts])
+	
 	if (userNotFound) {
 		return <UserNotFound />;
 	}

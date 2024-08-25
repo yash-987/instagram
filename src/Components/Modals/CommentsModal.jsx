@@ -33,12 +33,15 @@ const CommentsModal = ({ isOpen, onClose,post }) => {
 				return post;
 			})
 		);
+		
     };
     async function handlePostComment(e) {
 		e.preventDefault();
 		await handleComment(post.id, commentsRef.current.value);
-		addCommentToPostStore(post.id,commentsRef.current.value)
+		addCommentToPostStore(post.id, commentsRef.current.value)
+		
 		commentsRef.current.value = ''
+
     }
     
     useEffect(() => {
@@ -66,8 +69,9 @@ const CommentsModal = ({ isOpen, onClose,post }) => {
 						maxH={'250px'}
 						overflowY={'auto'}
                     >
-                        {post?.comments.map((comment,idx) => (
-                            <Comment comment={comment} key={idx} />
+                        {post.comments?.map((comment,idx) => (
+							<Comment key={idx} comment={comment} />
+							
                         ))}
 
                     </Flex>
